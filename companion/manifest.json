@@ -1,8 +1,8 @@
 {
 	"id": "aver-ptz",
 	"name": "aver-ptz",
-	"shortname": "aver-ptz-shortname",
-	"description": "PTZ VISCA commands over IP",
+	"shortname": "aver-ptz",
+	"description": "Control PTZ cameras with VISCA commands over IP",
 	"version": "1.0.0",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-aver-ptz.git",
