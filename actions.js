@@ -2,6 +2,7 @@ module.exports = function (self) {
 	self.setActionDefinitions({
 		zoom_in_action: {
 			name: 'Zoom In',
+			description: 'Adjust zoom in level 0 (low) - 07 (high)',
 			options: [
 				{
 					id: 'zoom_in',
@@ -23,6 +24,7 @@ module.exports = function (self) {
 		},
 		zoom_out_action: {
 			name: 'Zoom Out',
+			description: 'Adjust zoom out level 0 (low) - 07 (high)',
 			options: [
 				{
 					id: 'zoom_out',
@@ -44,6 +46,7 @@ module.exports = function (self) {
 		},
 		zoom_stop_action: {
 			name: 'Zoom Stop',
+			description: 'Stop zoom action',
 			options: [],
 			callback: async (event) => {
 				var cmd = '8101040700FF'
@@ -53,6 +56,7 @@ module.exports = function (self) {
 		},
 		focus_action: {
 			name: 'Focus',
+			description: 'Stop, Far, Near, Auto, Manual, One Push',
 			options: [
 				{
 					id: 'focus',
@@ -74,6 +78,7 @@ module.exports = function (self) {
 		},
 		wb_action: {
 			name: 'White Balance',
+			description: 'Auto, ATW, Indoor, Outdoor, One Push WB, Manual, One Push WB Trigger',
 			options: [
 				{
 					id: 'white_balance',
@@ -96,6 +101,7 @@ module.exports = function (self) {
 		},
 		red_gain_action: {
 			name: 'Red Gain',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'red_gain',
@@ -114,6 +120,7 @@ module.exports = function (self) {
 		},
 		blue_gain_action: {
 			name: 'Blue Gain',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'blue_gain',
@@ -132,6 +139,7 @@ module.exports = function (self) {
 		},
 		auto_exposure_action: {
 			name: 'Auto Exposure',
+			description: 'Full Auto, Manual, Shutter Priority, Iris Priority, Bright',
 			options: [
 				{
 					id: 'auto_exposure',
@@ -151,6 +159,7 @@ module.exports = function (self) {
 		},
 		shutter_action: {
 			name: 'Shutter',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'shutter',
@@ -169,6 +178,7 @@ module.exports = function (self) {
 		},
 		iris_action: {
 			name: 'Iris',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'iris',
@@ -185,8 +195,9 @@ module.exports = function (self) {
 				self.sendCommand(cmd)
 			},
 		},
-		gain__action: {
+		gain_action: {
 			name: 'Gain',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'gain',
@@ -205,6 +216,7 @@ module.exports = function (self) {
 		},
 		bright_action: {
 			name: 'Bright',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'bright',
@@ -223,6 +235,7 @@ module.exports = function (self) {
 		},
 		exposure_comp_action: {
 			name: 'Exposure Compensation',
+			description: 'Up (+), Down (-)',
 			options: [
 				{
 					id: 'exposure_comp',
@@ -241,6 +254,7 @@ module.exports = function (self) {
 		},
 		backlight_action: {
 			name: 'Backlight',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'backlight',
@@ -258,7 +272,8 @@ module.exports = function (self) {
 			},
 		},
 		preset_action: {
-			name: 'Preset',
+			name: 'Camera Preset',
+			description: 'Range 0 - 255, Recall (Load), Set (Save), Reset',
 			options: [
 				{
 					id: 'preset',
@@ -278,7 +293,8 @@ module.exports = function (self) {
 			],
 			callback: async (event) => {
 				var selected = (event.options.preset).toString()
-				var numInput = (event.options.num).toString(16).padStart(2, "0");
+				//Cast the event string into a number to convert to hexadecimal and add padding
+				var numInput = Number(event.options.num).toString(16).padStart(2, "0")
 				var cmd = '8101043F' + selected + numInput + 'FF'
 				//console.log(cmd)
 				self.sendCommand(cmd)
@@ -304,6 +320,7 @@ module.exports = function (self) {
 		},
 		pan_tilt_action: {
 			name: 'Pan Tilt',
+			description: 'Up, Down, Left, Right, Up Left, Up Right, Down Left, Down Right, Stop, Home, Reset, and Pan/Tilt speed 1 (low) - 24 (high)',
 			options: [
 				{
 					id: 'pan_tilt',
@@ -319,16 +336,16 @@ module.exports = function (self) {
 				{
 					id: 'pan_speed',
 					type: 'number',
-					label: 'Pan Speed',
-					default: 1,
+					label: 'Pan Speed: 1 (low) - 24 (high)',
+					default: 5,
 					min: 1,
 					max: 24,
 				},
 				{
 					id: 'tilt_speed',
 					type: 'number',
-					label: 'Tilt Speed',
-					default: 1,
+					label: 'Tilt Speed: 1 (low) - 24 (high)',
+					default: 5,
 					min: 1,
 					max: 24,
 				},
@@ -341,8 +358,8 @@ module.exports = function (self) {
 					cmd = '810106' + selected + 'FF'
 				}
 				else{
-					var panInput = (event.options.pan_speed).toString(16).padStart(2, "0");
-					var tiltInput = (event.options.tilt_speed).toString(16).padStart(2, "0");
+					var panInput = Number(event.options.pan_speed).toString(16).padStart(2, "0");
+					var tiltInput = Number(event.options.tilt_speed).toString(16).padStart(2, "0");
 					cmd = '81010601' + panInput + tiltInput + selected + 'FF'
 				}
 				//console.log(cmd)
@@ -351,6 +368,7 @@ module.exports = function (self) {
 		},
 		wdr_action: {
 			name: 'Wide Dynamic Range',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'wdr',
@@ -378,6 +396,7 @@ module.exports = function (self) {
 		},
 		tally_action: {
 			name: 'Tally Lamp',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'tally_lamp',
@@ -396,6 +415,7 @@ module.exports = function (self) {
 		},
 		freeze_action: {
 			name: 'Freeze',
+			description: 'On, Off, Preset On, Preset Off',
 			options: [
 				{
 					id: 'freeze',
@@ -415,6 +435,7 @@ module.exports = function (self) {
 		},
 		auto_tracking_action: {
 			name: 'Auto Tracking',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'auto_tracking',
@@ -431,8 +452,49 @@ module.exports = function (self) {
 				self.sendCommand(cmd)
 			},
 		},
+		frame_tracking_action: {
+			name: 'Frame Tracking',
+			description: 'Framing Start, Auto Framing, Manual Framing',
+			options: [
+				{
+					id: 'frame_tracking',
+					type: 'dropdown',
+					label: 'Select Configuration Type',
+					default: '02',
+					choices: [{ id: '00', label: 'Framing Start' }, { id: '02', label: 'Auto Framing Mode' },
+					{ id: '03', label: 'Manual Framing Mode' },],
+				},
+			],
+			callback: async (event) => {
+				var selected = (event.options.frame_tracking).toString()
+				var cmd = '8101047D' + selected + '00FF'
+				//console.log(cmd)
+				self.sendCommand(cmd)
+			},
+		},
+		audio_tracking_action: {
+			name: 'Audio Tracking',
+			description: 'Audio Tracking, Audio Frame, Audio Preset Tracking',
+			options: [
+				{
+					id: 'audio_tracking',
+					type: 'dropdown',
+					label: 'Select Configuration Type',
+					default: '04',
+					choices: [{ id: '04', label: 'Audio Tracking Mode' }, { id: '05', label: 'Audio Frame Mode' },
+					{ id: '06', label: 'Audio Preset Tracking Mode' },],
+				},
+			],
+			callback: async (event) => {
+				var selected = (event.options.audio_tracking).toString()
+				var cmd = '8101047D' + selected + '00FF'
+				//console.log(cmd)
+				self.sendCommand(cmd)
+			},
+		},
 		tracking_control_action: {
 			name: 'Tracking Control Mode',
+			description: 'Full Body, Upper Body, Tracking Point, Multi-Presenter, Presenter, Zone, Hybrid',
 			options: [
 				{
 					id: 'tracking_control',
@@ -440,7 +502,7 @@ module.exports = function (self) {
 					label: 'Select Configuration Type',
 					default: 'A4',
 					choices: [{ id: 'A0', label: 'Full Body' }, { id: 'A1', label: 'Upper Body' },
-					{ id: 'A2', label: 'Tracking Point' }, { id: 'A3', label: 'Switch' }, { id: 'A4', label: 'Presenter Mode' },
+					{ id: 'A2', label: 'Tracking Point' }, { id: 'A3', label: 'Multi-presenter' }, { id: 'A4', label: 'Presenter Mode' },
 					{ id: 'A5', label: 'Zone Mode' },{ id: 'A6', label: 'Hybrid Mode' },],
 				},
 			],
@@ -451,8 +513,47 @@ module.exports = function (self) {
 				self.sendCommand(cmd)
 			},
 		},
+		multi_presenter_action:{
+			name: 'Multi-presenter',
+			description: 'On, Off',
+			options: [
+				{
+					id: 'multi_presenter',
+					type: 'dropdown',
+					label: 'Select Configuration Type',
+					default: '02',
+					choices: [{id: '02', label: 'On'}, {id: '03', label: 'Off'},],
+				},
+			],
+			callback: async (event) => {
+				var selected = (event.options.multi_presenter).toString()
+				var cmd = '810104A9' + selected + 'FF'
+				self.sendCommand(cmd)
+			},
+		},
+		multi_presenter_set_preset_action: {
+			name: 'Multi-presenter Set Preset',
+			description: 'Range 0 - 255',
+			options: [
+				{
+					id: 'num',
+					type: 'number',
+					label: 'Preset Number',
+					default: 0,
+					min: 0,
+					max: 255,
+				},
+			],
+			callback: async (event) => {
+				var numInput = Number(event.options.num).toString(16).padStart(2, "0");
+				var cmd = '810104AA' + numInput + 'FF'
+				//console.log(cmd)
+				self.sendCommand(cmd)
+			},
+		},
 		autozoom_action: {
 			name: 'Auto Zoom',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'auto_zoom',
@@ -471,6 +572,7 @@ module.exports = function (self) {
 		},
 		effective_tracking_action: {
 			name: 'Effective Tracking Area',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'effective_tracking',
@@ -489,6 +591,7 @@ module.exports = function (self) {
 		},
 		rtmp_action: {
 			name: 'RTMP',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'rtmp',
@@ -507,6 +610,7 @@ module.exports = function (self) {
 		},
 		video_mode_action: {
 			name: 'Video Mode',
+			description: 'IP+Stream, USB, NDI, Streaming',
 			options: [
 				{
 					id: 'video_mode',
@@ -526,6 +630,7 @@ module.exports = function (self) {
 		},
 		presets_affect_action: {
 			name: 'Preset Affects PTZ & Focus',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'presets_affect',
@@ -544,6 +649,7 @@ module.exports = function (self) {
 		},
 		relative_zoom_action: {
 			name: 'Relative Zoom Ratio',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'relative_zoom',
@@ -562,6 +668,7 @@ module.exports = function (self) {
 		},
 		auto_tilt_action: {
 			name: 'Auto Tilt',
+			description: 'On, Off',
 			options: [
 				{
 					id: 'auto_tilt',
@@ -578,18 +685,38 @@ module.exports = function (self) {
 				self.sendCommand(cmd)
 			},
 		},
+		auto_zoom_tilt_set_preset_action: {
+			name: 'Auto Zoom/Tilt Set Preset',
+			description: 'Range 0 - 255',
+			options: [
+				{
+					id: 'num',
+					type: 'number',
+					label: 'Preset Number',
+					default: 0,
+					min: 0,
+					max: 255,
+				},
+			],
+			callback: async (event) => {
+				var numInput = Number(event.options.num).toString(16).padStart(2, "0");
+				var cmd = '810104A8' + numInput + 'FF'
+				//console.log(cmd)
+				self.sendCommand(cmd)
+			},
+		},
 		custom_action: {
 			name: 'Custom Command',
+			description: 'Use VISCA commands. See Help for additional guidance',
 			options: [
 				{
 					id: 'custom',
 					type: 'textinput',
-					label: 'Type custom hex command',
+					label: 'Type a VISCA command. See Help for additional guidance.',
 				},
 			],
 			callback: async (event) => {
-				var userInput = (event.options.custom).toString()
-				var cmd = userInput
+				var cmd = (event.options.custom).toString().replace(/ /g, "") // remove spaces
 				//console.log(cmd)
 				self.sendCommand(cmd)
 			},

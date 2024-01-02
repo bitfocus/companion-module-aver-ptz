@@ -1,7 +1,7 @@
 const { InstanceBase, Regex, runEntrypoint, InstanceStatus, UDPHelper } = require('@companion-module/base')
 const UpgradeScripts = require('./upgrades')
 const UpdateActions = require('./actions')
-const UpdatePresets = require('./presets.js')
+const UpdatePresets = require('./presets')
 
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
@@ -12,55 +12,61 @@ class ModuleInstance extends InstanceBase {
 	async init(config) {
 		this.config = config
 		await this.init_udp()
-		this.updateStatus(InstanceStatus.Ok)
+		this.updateStatus(InstanceStatus.Ok) // update status column to green checkmark
 		this.updateActions() // export actions
 		this.updatePresets()
 	}
 
 	init_udp() {
-		if (this.udp) {
-			this.udp.destroy()
-			delete this.udp
-		  }
+		//check if udp previously exists and destroy
+		this.destroy()
 
-		  this.udp = new UDPHelper(this.config.host, this.config.port)
-		  this.udp.on("error", (err) => {
-			  this.log("error", "Network error: " + err.message);
-			})
+		//initialize new UDPHelper
+		this.udp = new UDPHelper(this.config.host, this.config.port)
+		this.log('info', 'Initialized UDP')
+
+		//print errors to console
+		this.udp.on('error', (err) => {
+			this.log('error', "Network error: " + err.message);
+		})
+
+		//print received data to console
 		this.udp.on('data', (data) => {
-			this.updateStatus('ok')
 			let hexString = data.toString('hex')
-			if (hexString.length == 80) {
-				//this is the main settings information
-				this.updateData(Uint8Array.from(data))
-			}
-			//console.log(hexString)
+			this.log('console', "Reply: " + this.separateHex(hexString))
 		})
 	}
 
 	sendCommand(payload){
-		var newPayload = payload.replace(/ /g, "")
-
+		let newPayLoad, payLoadType, payloadLength, sequenceNumber, cmdBuff
+		
+		newPayLoad = payload
+		
+		//add packet header if visca over ip enabled
 		if(this.config.isviscaoverip){
-			var viscaIPheader = '010000'
-			var payloadLength = (newPayload.length / 2).toString(16).padStart(2, "0");
-			newPayload = viscaIPheader +  payloadLength + '00000000' + newPayload
+			//value 1 and value 2 for VISCA command
+			payLoadType = '0100'
+			//convert payload length to hexadecimal
+			payloadLength = Number(payload.length).toString(16).padStart(4, "0")
+			//statically set sequence number for now
+			sequenceNumber = ''.padStart(8, "0")
+			newPayLoad = payLoadType +  payloadLength + sequenceNumber + payload
 		}
 
-		var cmdBuff = Buffer.from(newPayload, 'hex')
+		//node.js encode from string to hex
+		cmdBuff = Buffer.from(newPayLoad, 'hex')
+	
+		this.log('console', "Send: " + this.separateHex(cmdBuff.toString('hex')))
 
-		//console.log(cmdBuff)
-		
 		this.udp.send(cmdBuff)
 	}
 
 	// When module gets deleted
 	async destroy() {
-		this.log('debug', 'destroy')
-
 		if (this.udp) {
 			this.udp.destroy();
 			delete this.udp;
+			this.log('info', 'Previous UDP connection detected and destroyed')
 		  }
 	}
 
@@ -97,12 +103,18 @@ class ModuleInstance extends InstanceBase {
 				regex: Regex.PORT,
 			},
 			{
-				id: 'isviscaoverip',
 				type: 'checkbox',
+				id: 'isviscaoverip',
 				label: 'VISCA over IP',
 				default: true
 			},
 		]
+	}
+
+	// format hex into grouped pairs for easier reading from console log
+	separateHex(hex) {
+		const regex = /([A-Fa-f0-9]{2})/g;
+		return hex.match(regex).join(' ');
 	}
 
 	updateActions() {
