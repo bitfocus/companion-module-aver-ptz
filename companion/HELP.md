@@ -23,5 +23,5 @@ For improved support a Custom Command button has been provided to allow versatil
 
 Most VISCA command documents will show 8x 01 04 3F 02 01 FF. The x represents the camera number, typically 1 is used for camera 1.
 
-For example: 81 01 04 3F 02 01 FF, with VISCA over IP enabled, will recall/load Camera 1 Preset 1 if it has been previously set.
+For example: 81 01 04 3F 02 01 FF, will recall/load Camera 1 Preset 1 if it has been previously set.
 

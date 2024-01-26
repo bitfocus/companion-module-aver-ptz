@@ -56,7 +56,7 @@ module.exports = function (self) {
 		},
 		focus_action: {
 			name: 'Focus',
-			description: 'Stop, Far, Near, Auto, Manual, One Push',
+			description: 'Stop, Far, Far (var), Near, Near (var), Auto, Manual, One Push',
 			options: [
 				{
 					id: 'focus',
@@ -64,13 +64,46 @@ module.exports = function (self) {
 					label: 'Select Configuration Type',
 					default: '3802',
 					choices: [
-						{ id: '0800', label: 'Stop' }, { id: '0802', label: 'Far' }, { id: '0803', label: 'Near' }, 
-						{ id: '3802', label: 'Auto' }, { id: '3803', label: 'Manual' }, { id: '1801', label: 'One Push' },
+						{ id: '0800', label: 'Stop' }, { id: '0802', label: 'Far' }, { id: '082', label: 'Far (var)'},
+						{ id: '0803', label: 'Near' }, { id: '083', label: 'Near (var)'}, { id: '3802', label: 'Auto' },
+						{ id: '3803', label: 'Manual' }, { id: '1801', label: 'One Push' },
 					],
+				},
+				{
+					id: 'far',
+					type: 'number',
+					isVisible: (options) => { 
+						const focus = options.focus.toString()
+						return ('082' === focus) 
+					},
+					label: 'Far: 0 (low) - 15 (high)',
+					default: 3,
+					min: 0,
+					max: 15,
+				},
+				{
+					id: 'near',
+					type: 'number',
+					isVisible: (options) => { 
+						const focus = options.focus.toString()
+						return ('083' === focus) 
+					},
+					label: 'Near: 0 (low) - 15 (high)',
+					default: 3,
+					min: 0,
+					max: 15,
 				},
 			],
 			callback: async (event) => {
 				var selected = (event.options.focus).toString()
+				//far variable
+				if(selected === '082'){
+					selected += Number(event.options.far).toString(16)
+				}
+				//near variable
+				if(selected === '083'){
+					selected += Number(event.options.near).toString(16)
+				}
 				var cmd = '810104' + selected + 'FF'
 				//console.log(cmd)
 				self.sendCommand(cmd)
@@ -86,8 +119,9 @@ module.exports = function (self) {
 					label: 'Select Configuration Type',
 					default: '3500',
 					choices: [
-						{ id: '3500', label: 'Auto' }, { id: '3504', label: 'ATW' }, { id: '3501', label: 'Indoor' }, { id: '3502', label: 'Outdoor' },
-						{ id: '3503', label: 'One Push WB mode' }, { id: '3505', label: 'Manual' }, { id: '1005', label: 'One Push WB trigger' },
+						{ id: '3500', label: 'Auto' }, { id: '3504', label: 'ATW' }, { id: '3501', label: 'Indoor' },
+						{ id: '3502', label: 'Outdoor' }, { id: '3503', label: 'One Push WB mode' },
+						{ id: '3505', label: 'Manual' }, { id: '1005', label: 'One Push WB trigger' },
 					],
 				},
 
@@ -285,7 +319,7 @@ module.exports = function (self) {
 				{
 					id: 'num',
 					type: 'number',
-					label: 'Preset Number',
+					label: 'Preset Number 0 - 255',
 					default: 0,
 					min: 0,
 					max: 255,
@@ -296,6 +330,35 @@ module.exports = function (self) {
 				//Cast the event string into a number to convert to hexadecimal and add padding
 				var numInput = Number(event.options.num).toString(16).padStart(2, "0")
 				var cmd = '8101043F' + selected + numInput + 'FF'
+				//console.log(cmd)
+				self.sendCommand(cmd)
+			},
+		},
+		profile_action: {
+			name: 'Profile',
+			description: 'Range 1 - 5, Read , Save',
+			options: [
+				{
+					id: 'profile',
+					type: 'dropdown',
+					label: 'Select Configuration Type',
+					default: '01',
+					choices: [{ id: '01', label: 'Read' }, { id: '02', label: 'Save' },],
+				},
+				{
+					id: 'num',
+					type: 'number',
+					label: 'Profile Number 1 - 5',
+					default: 1,
+					min: 1,
+					max: 5,
+				},
+			],
+			callback: async (event) => {
+				var selected = (event.options.profile).toString()
+				//Cast the event string into a number to convert to hexadecimal and add padding
+				var numInput = Number(event.options.num).toString(16).padStart(2, "0")
+				var cmd = '81010440' + selected + numInput + 'FF'
 				//console.log(cmd)
 				self.sendCommand(cmd)
 			},
@@ -336,6 +399,11 @@ module.exports = function (self) {
 				{
 					id: 'pan_speed',
 					type: 'number',
+					isVisible: (options) => { 
+						const pt = options.pan_tilt.toString()
+						if('04' === pt | '05' === pt){return false}
+						return true 
+					},
 					label: 'Pan Speed: 1 (low) - 24 (high)',
 					default: 5,
 					min: 1,
@@ -344,6 +412,11 @@ module.exports = function (self) {
 				{
 					id: 'tilt_speed',
 					type: 'number',
+					isVisible: (options) => { 
+						const pt = options.pan_tilt.toString()
+						if('04' === pt | '05' === pt){return false}
+						return true 
+					},
 					label: 'Tilt Speed: 1 (low) - 24 (high)',
 					default: 5,
 					min: 1,
@@ -448,6 +521,25 @@ module.exports = function (self) {
 			callback: async (event) => {
 				var selected = (event.options.auto_tracking).toString()
 				var cmd = '8101047D' + selected + 'FF'
+				//console.log(cmd)
+				self.sendCommand(cmd)
+			},
+		},
+		auto_tracking_v1_action: {
+			name: 'Auto Tracking v1',
+			description: 'On, Off; An alternate command for Auto Tracking',
+			options: [
+				{
+					id: 'auto_tracking_v1',
+					type: 'dropdown',
+					label: 'Select Configuration Type',
+					default: '02',
+					choices: [{ id: '02', label: 'On' }, { id: '03', label: 'Off' },],
+				},
+			],
+			callback: async (event) => {
+				var selected = (event.options.auto_tracking_v1).toString()
+				var cmd = '8101047D' + selected + '00FF'
 				//console.log(cmd)
 				self.sendCommand(cmd)
 			},

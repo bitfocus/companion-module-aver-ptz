@@ -1,7 +1,7 @@
 const { InstanceBase, Regex, runEntrypoint, InstanceStatus, UDPHelper } = require('@companion-module/base')
-const UpgradeScripts = require('./upgrades')
-const UpdateActions = require('./actions')
-const UpdatePresets = require('./presets')
+const UpgradeScripts = require('./upgrades.js')
+const UpdateActions = require('./actions.js')
+const UpdatePresets = require('./presets.js')
 
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
@@ -14,7 +14,7 @@ class ModuleInstance extends InstanceBase {
 		await this.init_udp()
 		this.updateStatus(InstanceStatus.Ok) // update status column to green checkmark
 		this.updateActions() // export actions
-		this.updatePresets()
+		this.updatePresets() // export presets
 	}
 
 	init_udp() {
