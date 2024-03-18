@@ -11,8 +11,8 @@ class ModuleInstance extends InstanceBase {
 	//initial module loading
 	async init(config) {
 		this.config = config
-		await this.init_udp()
 		this.updateStatus(InstanceStatus.Ok) // update status column to green checkmark
+		this.init_udp()
 		this.updateActions() // export actions
 		this.updatePresets() // export presets
 	}
@@ -25,15 +25,17 @@ class ModuleInstance extends InstanceBase {
 		this.udp = new UDPHelper(this.config.host, this.config.port)
 		this.log('info', 'Initialized UDP')
 
-		//print errors to console
-		this.udp.on('error', (err) => {
-			this.log('error', "Network error: " + err.message);
+		//print errors to console and update status column
+		this.udp.on('error', (e) => {
+			this.log('error', "Network error: " + e.message)
+			this.updateStatus(InstanceStatus.UnknownError, e.message) // update status column to error message
 		})
 
 		//print received data to console
 		this.udp.on('data', (data) => {
 			let hexString = data.toString('hex')
-			this.log('console', "Reply: " + this.separateHex(hexString))
+			this.log('console', "Reply: " + hexString)
+			this.updateStatus(InstanceStatus.Ok) // update status column to green checkmark
 		})
 	}
 
@@ -73,7 +75,7 @@ class ModuleInstance extends InstanceBase {
 	//update to module configuration settings
 	async configUpdated(config) {
 		this.config = config
-		await this.init_udp()
+		this.init_udp()
 		this.updatePresets()
 	}
 
