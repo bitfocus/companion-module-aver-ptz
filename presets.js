@@ -38,7 +38,7 @@ var image_down_left = 'iVBORw0KGgoAAAANSUhEUgAAAEgAAAA6CAMAAAAk2e+/AAABS2lUWHRYT
 
    The other templateElements variables are optional
 */
-var templateElements = function  (){
+function templateElements(){
         this.key // unique key, or name, for each preset
         this.category // preset category
         this.text // text of the button
