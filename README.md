@@ -1,18 +1,18 @@
 # companion-module-aver-ptz
 A [Bitfocus](https://github.com/bitfocus) Companion version 3.x.x module.
 
-The purpose of this module is for controlling [AVER](https://averusa.com/products/ptz-camera/) Pan, Tilt, Zoom (PTZ) camera models that support VISCA commands over IP. The primary difference with VISCA commands and VISCA over IP are the IP packet headers.
+The purpose of this module is for managing [AVER](https://averusa.com/products/ptz-camera/) Pan, Tilt, Zoom (PTZ) camera models that can be controlled using VISCA commands over IP. 
 
-## Compile for development:
+## Install dependencies for development:
 
 **Environment:**
 Install NPM, Yarn, and Bitfocus Companion.
 
 **Steps:**
-1. Create a new folder named companion-module-dev.
-2. Clone and unzip the branch into this folder.
-3. In a command prompt/terminal, run **yarn** to download files.
-4. Launch Companion and modify the Developer modules path to companion-module-dev.
+1. Create a new folder named <code>companion-module-dev</code>.
+2. Clone and unzip the branch into the <code>companion-module-dev</code> folder.
+3. In a command prompt/terminal, navigate to the unzipped folder, type <code>yarn</code> to download dependency files.
+4. Launch Companion and modify the Developer modules path to <code>companion-module-dev</code>.
 5. The module appears in “Add Connection” search as “Aver” or "PTZ"
 
 ## Testing VISCA over IP with camera:
