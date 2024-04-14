@@ -10,7 +10,7 @@ Use VISCA commands to control the PTZ camera. Please note that some VISCA comman
 
 **Target Port:** The port of the device. The default is 52381.
 
-**VISCA over IP:** An IP packet header included with the VISCA command. The default is checked. To remove the IP packet header from VISCA commands uncheck the option.
+**VISCA over IP:** An IP packet header prepended to the VISCA command. The default is checked. To remove the IP packet header from VISCA commands uncheck the option.
 
 UDP is the transportation protocol used of this module.
 
