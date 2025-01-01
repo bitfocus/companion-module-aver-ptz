@@ -3,6 +3,8 @@ const UpgradeScripts = require('./upgrades.js')
 const UpdateActions = require('./actions.js')
 const UpdatePresets = require('./presets.js')
 
+let sequenceNumber = 0 // initialize sequence number
+
 class ModuleInstance extends InstanceBase {
 	constructor(internal) {
 		super(internal)
@@ -40,22 +42,23 @@ class ModuleInstance extends InstanceBase {
 	}
 
 	sendCommand(payload){
-		let newPayLoad, payLoadType, payloadLength, sequenceNumber, cmdBuff
-		
+		let newPayLoad, payloadLength, hexSequenceNumber, cmdBuff
+		let payLoadType = '0100' //value 1 and value 2 for VISCA command
+
 		newPayLoad = payload
 		
 		//add packet header if visca over ip enabled
 		if(this.config.isviscaoverip){
-			//value 1 and value 2 for VISCA command
-			payLoadType = '0100'
 			//convert payload length to hexadecimal
 			payloadLength = Number(payload.length).toString(16).padStart(4, "0")
-			//statically set sequence number for now
-			sequenceNumber = ''.padStart(8, "0")
-			newPayLoad = payLoadType +  payloadLength + sequenceNumber + payload
+			//get the sequence number
+			hexSequenceNumber = sequenceNumber.toString(16).padStart(8, '0');
+			//increment the sequence number
+			this.incrementSequenceNumber()
+			newPayLoad = payLoadType + payloadLength + hexSequenceNumber + payload
 		}
 
-		//node.js encode from string to hex
+		//node.js encode from string to hexadecimal
 		cmdBuff = Buffer.from(newPayLoad, 'hex')
 	
 		this.log('console', "Send: " + this.separateHex(cmdBuff.toString('hex')))
@@ -113,11 +116,16 @@ class ModuleInstance extends InstanceBase {
 		]
 	}
 
-	// format hex into grouped pairs for easier reading from console log
+	// function to format hexadecimal into grouped pairs for easier reading from console log
 	separateHex(hex) {
 		const regex = /([A-Fa-f0-9]{2})/g;
 		return hex.match(regex).join(' ');
 	}
+
+    // function to increment the sequence number
+    incrementSequenceNumber(){
+    	sequenceNumber = (sequenceNumber + 1) >>> 0; // increment, convert to unsigned 32-bit int, wrap around above 0xFFFFFFFF
+    }
 
 	updateActions() {
 		UpdateActions(this)
